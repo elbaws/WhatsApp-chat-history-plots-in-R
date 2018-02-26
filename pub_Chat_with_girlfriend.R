@@ -3,8 +3,9 @@ rm(list = ls())
 
 #Load the required packages
 library(ggplot2) #We use this one for all the plots
-library(stringr) #Used for splitting up message strings into seperate word strings
+library(stringr)
 library(extrafont) #To be able to use some additional fonts in the plots
+library(tokenizers) #Used for splitting up message strings into seperate word strings
 
 setwd("/Users/swable/Downloads/Chat data visualisatie/") #Change this to whatever path your data is.
 
