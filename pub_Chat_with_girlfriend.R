@@ -9,13 +9,10 @@ library(tokenizers) #Used for splitting up message strings into seperate word st
 
 setwd("/Users/swable/Downloads/Chat data visualisatie/") #Change this to whatever path your data is.
 
-#This is the raw data as provided by Whatsapp. I did however change the type
-#from .txt to .csv to make it easier to read it in to R. Just open the .txt file
-#in excel and then save it to .csv.
-chathistory <- read.csv("WhatsApp_Chat_with_Swable.csv", sep = "")
-colnames(chathistory)[1] <- "raw" #Rename the first column to raw
-chathistory[2] <- NULL #And the delete the second column, which only includes some trash.
-chathistory$raw <- as.character(chathistory$raw) #Convert the raw data into string.
+#This is the raw data as provided by Whatsapp.
+chathistory <- data.frame(readLines(file("WhatsApp_Chat_with_Swable.txt", open = "r")))
+colnames(chathistory)[1] <- "raw"
+chathistory$raw <- as.character(chathistory$raw)
 
 #Because my data included some missing days (I changed phones at some point, and 
 #something messed up part of the data), I generate a list of all days during my
@@ -36,13 +33,11 @@ chathistory <- subset(chathistory, grepl("^[0-9]", chathistory$raw))
 chathistory <- subset(chathistory, nchar(raw) > 10)
 
 #Break-up into columns
-chathistory$date <- gsub(",.*$", "", chathistory$raw)
-chathistory$time <- gsub("\\s+.*$", "", gsub("^\\S+\\s+", "", chathistory$raw))
-chathistory$person <- substr(gsub(":.*$", "", gsub("^\\S+\\s+\\S+\\s+\\S+\\s+", "", chathistory$raw)), 1, 1)
+chathistory$date <- gsub(",.*$", "", chathistory$raw, perl = T)
+#chathistory$time <- regmatches(chathistory$raw, regexpr("[0-9][0-9]:[0-9][0-9]", chathistory$raw))
+chathistory$time <- gsub(".*([0-9][0-9]:[0-9][0-9]).*", "\\1", chathistory$raw, perl = T)
+chathistory$person <- substr(sub(".*\\s-\\s(\\w*:|\\w*\\s\\w*:).*", "\\1", chathistory$raw), 1, 1)
 chathistory$message <- gsub("^.*?:.*?:\\s+", "", chathistory$raw)
-
-#Clean some more
-chathistory <- subset(chathistory, person == "A" | person == "B")
 
 #Break-up further
 chathistory$year <- as.numeric(gsub("^.*/", "", chathistory$date)) + 2000
