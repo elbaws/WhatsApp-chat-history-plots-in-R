@@ -14,6 +14,22 @@ chathistory <- data.frame(readLines(file("WhatsApp_Chat_with_Swable.txt", open =
 colnames(chathistory)[1] <- "raw"
 chathistory$raw <- as.character(chathistory$raw)
 
+#In exported file multi line messages occupies multiple lines 
+#This is a problem for this code as it will remove those messages which don't have a date at start
+#I've written this code to append those other lines to the first line so that all text is included
+
+lastDateIndex <- -1
+for(index in 0:length(chathistory$raw)){
+  index <- index+1
+  if(is.na(strptime(chathistory$raw[index],format='%d/%m/%Y'))==FALSE){
+    lastDateIndex <- index
+  }
+  else{
+    if(lastDateIndex>-1){
+      chathistory$raw[lastDateIndex] <- paste(chathistory$raw[lastDateIndex],chathistory$raw[index],collapse=" ")
+    }
+  }
+}
 #Because my data included some missing days (I changed phones at some point, and 
 #something messed up part of the data), I generate a list of all days during my
 #period of analysis (19-11-2014 - 20-02-2018).
